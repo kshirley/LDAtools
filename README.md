@@ -1,4 +1,10 @@
 LDAviz
 ======
 
-R package to create interactive d3 visualization of LDA topic model
+R package for fitting and visualizing topic models. To install the package:
+
+```library(devtools); install_github("LDAviz", "cpsievert"); library(LDAviz)```
+
+To run the shiny web app:
+
+```library(shiny); runApp(system.file('shiny', 'hover', package='LDAviz'))```

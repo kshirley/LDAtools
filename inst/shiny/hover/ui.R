@@ -1,7 +1,7 @@
 library(shiny)
 library(LDAviz)
-#anytime a file under the assets folder is changed, ldatools must be reinstalled (to reflect the change)!
-addResourcePath('assets', system.file('shiny', 'hover', 'assets', package='ldatools'))
+#anytime a file under the assets folder is changed, LDAviz must be reinstalled (to reflect the change)!
+addResourcePath('assets', system.file('shiny', 'hover', 'assets', package='LDAviz'))
 
 #nice idea, but it doesn't adapt to uploaded data
 # data(input)

@@ -3,6 +3,7 @@ library(LDAviz)
 library(proxy)
 library(reshape)
 library(plyr)
+source("getProbsOld.R") #Kenny made some changes to getProbs -- use the old version -- getProbsOld
 
 options(shiny.maxRequestSize=100*1024^2) #change default file upload size from 5MB to 100MB
 
@@ -68,10 +69,10 @@ shinyServer(function(input, output) {
   
   getMatrices <- reactive({ 
     stuff <- filter()
-    #getProbs(word.id=as.integer(stuff$words), doc.id=as.integer(stuff$docs), topic.id=as.integer(stuff$topics), 
-    #         vocab=as.character(stuff$vocab), sort.topics="byDocs", sort.terms="saliency")
-    getProbs(word.id=as.integer(stuff$words), doc.id=as.integer(stuff$docs), topic.id=as.integer(stuff$topics), 
-             vocab=as.character(stuff$vocab), sort.topics="byDocs", K=30)
+    getProbsOld(word.id=as.integer(stuff$words), doc.id=as.integer(stuff$docs), topic.id=as.integer(stuff$topics), 
+            vocab=as.character(stuff$vocab), sort.topics="byDocs", sort.terms="saliency")
+#     getProbsOld(word.id=as.integer(stuff$words), doc.id=as.integer(stuff$docs), topic.id=as.integer(stuff$topics), 
+#              vocab=as.character(stuff$vocab), sort.topics="byDocs", K=30)
   })
   
   output$mdsDat <- reactive({

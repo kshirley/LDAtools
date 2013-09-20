@@ -1,5 +1,5 @@
 library(shiny)
-library(ldatools)
+library(LDAviz)
 #anytime a file under the assets folder is changed, ldatools must be reinstalled (to reflect the change)!
 addResourcePath('assets', system.file('shiny', 'hover', 'assets', package='ldatools'))
 

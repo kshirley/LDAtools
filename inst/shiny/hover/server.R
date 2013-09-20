@@ -1,5 +1,5 @@
 library(shiny)
-library(ldatools)
+library(LDAviz)
 library(proxy)
 library(reshape)
 library(plyr)

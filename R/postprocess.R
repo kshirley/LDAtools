@@ -361,7 +361,6 @@ topdocs <- function(theta, docs, n=30){
 #' @param y The vector of probabilities in the second distribution
 #'
 #' @export
-#' @examples
 
 # symmetric version of kullback-leibler divergence:
 KL <- function(x, y) {

@@ -23,7 +23,7 @@
 #' @references Griffiths and Steyvers (2004). Finding Scientific Topics. Proceedings of the National Academy of Sciences. 
 #'
 #' @export
-#' @useDynLib ldatools
+#' @useDynLib LDAviz
 #'
 #' @examples
 #' data(APinput)
@@ -91,7 +91,7 @@ fitLDA <- function(word.id=integer(), doc.id=integer(), k=10, n.chains=1, n.iter
 #' The second element is a vector with the log-likelihood values for every iteration of the Gibbs sampler. 
 #' 
 #' @export
-#' @useDynLib ldatools
+#' @useDynLib LDAviz
 #'
 #' @examples
 #' data(APinput)

@@ -1,5 +1,5 @@
-#' ldatools
+#' LDAviz
 #'
-#' @name ldatools
+#' @name LDAviz
 #' @docType package
 NULL

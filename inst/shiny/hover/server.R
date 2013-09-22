@@ -14,9 +14,9 @@ KL <- function(x, y) { #compute Kullback-Leibler divergence
 shinyServer(function(input, output) {
   
   getSample <- reactive( {
-    data(APtopdocs, package="ldatools")
-    data(APinput, package="ldatools")
-    data(APtopics, package="ldatools")
+    data(APtopdocs, package="LDAviz")
+    data(APinput, package="LDAviz")
+    data(APtopics, package="LDAviz")
     #inp <- get("input", env=globalenv())  #input is an unfortunate name...
     return(list(docs=APinput$doc.id, topics=APtopics$topics[,1], words=APinput$word.id, 
                 vocab=APinput$vocab, topdocs=top.docs))

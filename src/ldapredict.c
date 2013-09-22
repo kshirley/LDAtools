@@ -28,7 +28,6 @@ void ldapredict(int *word_id_R, int *doc_id_R, int *T_R, int *n_chains_R, int *n
   int D = D_R[0];
   int i, k, t, w, d, g, j, x;
   double alpha = alpha_R[0];
-  //double beta = beta_R[0];
 	  
   // Read in the word_id and doc_id vectors:
   int *word_id, *doc_id;
@@ -42,23 +41,20 @@ void ldapredict(int *word_id_R, int *doc_id_R, int *T_R, int *n_chains_R, int *n
   // Internal objects:
   int **z, *r, **CDT, *docsum;
   double **phi, *s, Talpha = T * alpha;
-  double *prob_vec, *prob_norm, *n1, *n2;
+  double *prob_vec, *prob_norm, *n1, *n2, *llprob;
   double loglik = 0.0, ll = 0.0;
-	//int *topicsum, **CTW;
 
   // Set up a the count variables:
-  //CTW = imatrix(T, W);
   CDT = imatrix(D, T);
   docsum = ivector(D);
-  //topicsum = ivector(T);
 
   // Set up paramters:
   z = imatrix(n_chains, N);
-  //theta = dmatrix(D, T);
   phi = dmatrix(T, W);
 	
   // placeholders for the dirichlet draws:
   prob_vec = dvector(T);
+  llprob = dvector(T);
   prob_norm = dvector(T);
   n1 = dvector(T);
   n2 = dvector(T);
@@ -73,10 +69,8 @@ void ldapredict(int *word_id_R, int *doc_id_R, int *T_R, int *n_chains_R, int *n
       topics_init[k][i] = topics_init_R[i*n_chains + k];
     }
   }
-  //Rprintf("%d %d %d\n", topics_init[0][0], topics_init[1][0], topics_init[2][0]);
-  //Rprintf("%d %d %d\n", topics_init[0][9], topics_init[1][9], topics_init[2][9]);
 
-	// Initialize the topic-token distributions from input:
+  // Initialize the topic-token distributions from input:
   for (t = 0; t < T; t++) {
     for (w = 0; w < W; w++) {
       phi[t][w] = phi_R[w*T + t];
@@ -88,21 +82,14 @@ void ldapredict(int *word_id_R, int *doc_id_R, int *T_R, int *n_chains_R, int *n
     Rprintf("\nChain %d\n", k + 1);
     // initialize counts:
     for (t = 0; t < T; t++) {
-      //for (w = 0; w < W; w++) {
-      //  CTW[t][w] = 0;
-      //}	
       for (d = 0; d < D; d++) {
         CDT[d][t] = 0;
       }
     }
     for (d = 0; d < D; d++) docsum[d] = 0;
-    //for (t = 0; t < T; t++) topicsum[t] = 0;
-    // fill up count matrices and fill initial values of z:
     for (i = 0; i < N; i++) {
       z[k][i] = topics_init[k][i];
-      //CTW[z[k][i] - 1][word_id[i] - 1]++;
       CDT[doc_id[i] - 1][z[k][i] - 1]++;
-      //topicsum[z[k][i] - 1]++;
       docsum[doc_id[i] - 1]++;
     }
     loglik_R[0*n_chains + k] = 0;
@@ -113,34 +100,33 @@ void ldapredict(int *word_id_R, int *doc_id_R, int *T_R, int *n_chains_R, int *n
       loglik = 0.0;
       for (i = 0; i < N; i++) {
         // decrement counts:
-        //CTW[z[k][i] - 1][word_id[i] - 1]--;
         CDT[doc_id[i] - 1][z[k][i] - 1]--;
-        //topicsum[z[k][i] - 1]--;
-				docsum[doc_id[i] - 1]--;
-				// loop through topics:
-				ll = 0.0;
+	docsum[doc_id[i] - 1]--;
+	// loop through topics:
+	ll = 0.0;
         for (t = 0; t < T; t++) {
-					// compute probability of each topic:
-					//n1[t] = CTW[t][word_id[i] - 1] + beta;
-					//prob_vec[t] = (n1[t] * n2[t])/((topicsum[t] + Wbeta) * (docsum[doc_id[i] - 1] + Talpha));
-					n2[t] = CDT[doc_id[i] - 1][t] + alpha;
-					prob_vec[t] = phi[t][word_id[i] - 1] * n2[t]/(docsum[doc_id[i] - 1] + Talpha);					
-					ll += prob_vec[t];
-				}
+	// compute probability of each topic:
+	  n2[t] = CDT[doc_id[i] - 1][t] + alpha;
+	  prob_vec[t] = phi[t][word_id[i] - 1] * n2[t]/(docsum[doc_id[i] - 1] + Talpha);					
+	  if (z[k][i] - 1 == t) {
+	    llprob[t] = phi[t][word_id[i] - 1] * (n2[t] + 1)/(docsum[doc_id[i] - 1] + 1 + Talpha);
+	  } else {
+	    llprob[t] = phi[t][word_id[i] - 1] * n2[t]/(docsum[doc_id[i] - 1] + 1 + Talpha);
+	  }
+	  ll += llprob[t];
+	}
         // normalize probability vector for topic draw:
-				s[0] = 0.0;
-				dsum(prob_vec, T, s);
-				for (t = 0; t < T; t++) prob_norm[t] = prob_vec[t]/s[0];
-				// draw the topic for this token:
-				r[0] = 0;
-				sample(1, T, prob_norm, r);
-				z[k][i] = r[0];
-				// increment counts:
-				//CTW[z[k][i] - 1][word_id[i] - 1]++;
-				CDT[doc_id[i] - 1][z[k][i] - 1]++;
-        //topicsum[z[k][i] - 1]++;
-				docsum[doc_id[i] - 1]++;
-				loglik += log(ll);
+	s[0] = 0.0;
+	dsum(prob_vec, T, s);
+	for (t = 0; t < T; t++) prob_norm[t] = prob_vec[t]/s[0];
+	// draw the topic for this token:
+	r[0] = 0;
+	sample(1, T, prob_norm, r);
+	z[k][i] = r[0];
+	// increment counts:
+	CDT[doc_id[i] - 1][z[k][i] - 1]++;
+	docsum[doc_id[i] - 1]++;
+	loglik += log(ll);
       } // i=N
       loglik_R[g*n_chains + k] = loglik;
     } // g=G
@@ -167,6 +153,7 @@ void ldapredict(int *word_id_R, int *doc_id_R, int *T_R, int *n_chains_R, int *n
   free_dmatrix(phi, T);
 
   free_dvector(prob_vec);
+  free_dvector(llprob);
   free_dvector(prob_norm);
   free_dvector(n1);
   free_dvector(n2);

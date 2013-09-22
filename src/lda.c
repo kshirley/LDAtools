@@ -42,7 +42,7 @@ void lda(int *word_id_R, int *doc_id_R, int *T_R, int *n_chains_R, int *n_iter_R
   // Internal objects:
   int **z, *r, **CTW, **CDT, *topicsum, *docsum;
   double **theta, **phi, *s, Wbeta = W * beta, Talpha = T * alpha;
-  double *prob_vec, *prob_norm, *n1, *n2;
+  double *prob_vec, *prob_norm, *n1, *n2, *llprob;
   double loglik = 0.0, ll = 0.0;
 
   // Set up a the count variables:
@@ -58,6 +58,7 @@ void lda(int *word_id_R, int *doc_id_R, int *T_R, int *n_chains_R, int *n_iter_R
 	
   // placeholders for the dirichlet draws:
   prob_vec = dvector(T);
+  llprob = dvector(T);
   prob_norm = dvector(T);
   n1 = dvector(T);
   n2 = dvector(T);
@@ -116,7 +117,12 @@ void lda(int *word_id_R, int *doc_id_R, int *T_R, int *n_chains_R, int *n_iter_R
 	  n1[t] = CTW[t][word_id[i] - 1] + beta;
 	  n2[t] = CDT[doc_id[i] - 1][t] + alpha;
 	  prob_vec[t] = (n1[t] * n2[t])/((topicsum[t] + Wbeta) * (docsum[doc_id[i] - 1] + Talpha));
-	  ll += prob_vec[t];
+	  if (z[k][i] - 1 == t) {
+	    llprob[t] = ((n1[t] + 1) * (n2[t] + 1))/((topicsum[t] + 1 + Wbeta) * (docsum[doc_id[i] - 1] + 1 + Talpha));
+	  } else {
+	    llprob[t] = ((n1[t]) * (n2[t]))/((topicsum[t] + Wbeta) * (docsum[doc_id[i] - 1] + 1 + Talpha));
+	  }
+	  ll += llprob[t];
 	}
         // normalize probability vector for topic draw:
 	s[0] = 0.0;
@@ -158,6 +164,7 @@ void lda(int *word_id_R, int *doc_id_R, int *T_R, int *n_chains_R, int *n_iter_R
   free_dmatrix(phi, T);
 
   free_dvector(prob_vec);
+  free_dvector(llprob);
   free_dvector(prob_norm);
   free_dvector(n1);
   free_dvector(n2);

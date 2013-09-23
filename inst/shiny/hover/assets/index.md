@@ -53,3 +53,11 @@ When a topic is selected, the most relevant documents pertaining to that topic a
 ### Upload your own model
 
 By checking the "Upload Data?" option at the top of the page, one can upload up to two local files. The data from a fitted topic model is required while the actual documents are optional. The required file must be a tab-delimited text file with three columns. One column must be named 'tokens' and should have a string of a single word for each row. The other column must be name 'docs' and each row should have one integer corresponding to the document that each tokens belong to. The last column must be named 'topics' and each row should have one integer corresponding to the topic that each token belongs to. The optional file must also be tab-delimited text file with a column for each topic (each named 'TopicX'). The values are assumed be the most representative documents for each topic. See the topdocs function in the ldatools package for details on how to compute representative documents for a topic.
+
+### Contribute
+
+The version of the source files to this application can be found [here](https://github.com/kshirley/LDAviz). Feel free to send us a pull request!
+
+### Acknowledgements
+
+This project was made possible by [AT&T's summer research internship](http://www.research.att.com/internships). The author, [Carson Sievert](http://cpsievert.github.io/), would like to thank [Kenny Shirley](http://www2.research.att.com/~kshirley/) in particular for his guidance and patience. Other people who were important to this project include: [Carlos Scheidegger](http://www.research.att.com/people/Scheidegger_Carlos_E/?fbid=3gzX7Cx1EOz), [Chris Volinsky](http://www2.research.att.com/~volinsky/), [Debby Swayne](http://www.research.att.com/people/Swayne_Deborah_F/index.html?fbid=3gzX7Cx1EOz) and [Simon Urbanek](http://urbanek.info/).

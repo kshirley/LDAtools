@@ -298,8 +298,10 @@ var scatterOutputBinding = new Shiny.OutputBinding();
           .attr("class", "mds-data2");
 
       //establish layout and vars for bar chart
-      var barDefault = barData.filter(function(d) { return d.Category == "Default" });
-      var barDefault2 = barDefault.sort(fancysort("Order"));
+      
+      var barDefault2 = barData.filter(function(d) { return d.Category == "Default" });
+      //var barDefault2 = barDefault.sort(fancysort("Order")); //can't remeber why i did this in the 1st place
+      //console.log(barDefault2);
 
       var y = d3.scale.ordinal()
                       .domain(barDefault2.map(function(d) { return d.Term; }))
@@ -411,8 +413,8 @@ function cluster_on(d) {
     .style("text-decoration", "underline")  
     .text(Freq + "% of tokens fall under cluster " + cluster);
 
-  var dat = d3.select("svg").selectAll(".bar-chart").data().filter(function(d) { return d.Category == "Cluster"+cluster });
-  var dat2 = dat.sort(fancysort("Order"));
+  var dat2 = d3.select("svg").selectAll(".bar-chart").data().filter(function(d) { return d.Category == "Cluster"+cluster });
+  //var dat2 = dat.sort(fancysort("Order"));
 
   var y = d3.scale.ordinal()
               .domain(dat2.map(function(d) { return d.Term; }))
@@ -489,8 +491,9 @@ function topic_on(d) {
       .style("text-decoration", "underline")  
       .text(Freq + "% of tokens fall under topic " + topics);
 
-    var dat = d3.select("svg").selectAll(".bar-chart").data().filter(function(d) { return d.Category == "Topic"+topics });
-    var dat2 = dat.sort(fancysort("Order"));
+    var dat2 = d3.select("svg").selectAll(".bar-chart").data().filter(function(d) { return d.Category == "Topic"+topics });
+    //var dat2 = dat.sort(fancysort("Order"));
+    //console.log(dat2);
 
     var y = d3.scale.ordinal()
                 .domain(dat2.map(function(d) { return d.Term; }))
@@ -550,7 +553,7 @@ function topic_on(d) {
     
     //remove any shown documents
     d3.selectAll(".topdocs").remove();
-    console.log(docDat);
+    //console.log(docDat);
     //Draw the default documents
     d3.select(".doc-list").selectAll("topdocs")
       .data(docDat)
@@ -577,9 +580,9 @@ function cluster_off() {
 
     //go back to 'default' bar chart
     //Is there a better way to do this with .exit()?
-    var dat = d3.select("svg").selectAll(".bar-chart").data().filter(function(d) { return d.Category == "Default" });
+    var dat2 = d3.select("svg").selectAll(".bar-chart").data().filter(function(d) { return d.Category == "Default" });
 
-    var dat2 = dat.sort(fancysort("Order"));
+    //var dat2 = dat.sort(fancysort("Order"));
 
     var y = d3.scale.ordinal()
                 .domain(dat2.map(function(d) { return d.Term; }))
@@ -637,8 +640,8 @@ function topic_off() {
 
     //go back to 'default' bar chart
     //Is there a better way to do this with .exit()?
-    var dat = d3.select("svg").selectAll(".bar-chart").data().filter(function(d) { return d.Category == "Default" });
-    var dat2 = dat.sort(fancysort("Order"));
+    var dat2 = d3.select("svg").selectAll(".bar-chart").data().filter(function(d) { return d.Category == "Default" });
+    //var dat2 = dat.sort(fancysort("Order"));
 
     var y = d3.scale.ordinal()
                 .domain(dat2.map(function(d) { return d.Term; }))
@@ -740,8 +743,5 @@ function text_off() {
         stacked.push( innerStack );
       }
 
-      console.log("LAYOUT---------------------------");
-      var stacked = d3.layout.stack()(outerStack)
-      console.log(stacked)
 */
 

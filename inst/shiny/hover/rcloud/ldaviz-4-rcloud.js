@@ -119,7 +119,7 @@ d3.json("lda.json", function(error, data) {
       }
 
       var barData = [];
-      for (var i=0; i<data['barDat'].Term.length; i++)  { 
+      for (var i=0; i < data['barDat'].Term.length; i++)  { 
         var obj = {};
         for (var key in data['barDat']){
           obj[key] = data['barDat'][key][i];
@@ -178,6 +178,22 @@ d3.json("lda.json", function(error, data) {
                 reset_state();
             });
       
+      svg.append("line") //draw x-axis
+        .attr("x1", 0)
+        .attr("x2", mdswidth)
+        .attr("y1", mdsheight/2) 
+        .attr("y2", mdsheight/2)
+        .attr("stroke", "gray")
+        .attr("opacity", 0.3);
+
+      svg.append("line") //draw y-axis
+        .attr("x1", mdswidth/2) 
+        .attr("x2", mdswidth/2)
+        .attr("y1", 0)
+        .attr("y2", mdsheight)
+        .attr("stroke", "gray")
+        .attr("opacity", 0.3);
+
 
       var points = svg.selectAll("points")
         .data(mdsData)
@@ -222,22 +238,6 @@ d3.json("lda.json", function(error, data) {
             current_hover.object = undefined;
             update_drawing();
         });
-
-      svg.append("line") //draw x-axis
-        .attr("x1", 0)
-        .attr("x2", mdswidth)
-        .attr("y1", mdsheight/2) 
-        .attr("y2", mdsheight/2)
-        .attr("stroke", "gray")
-        .attr("opacity", 0.3);
-
-      svg.append("line") //draw y-axis
-        .attr("x1", mdswidth/2) 
-        .attr("x2", mdswidth/2)
-        .attr("y1", 0)
-        .attr("y2", mdsheight)
-        .attr("stroke", "gray")
-        .attr("opacity", 0.3);
 
       //Draw voronio map around cluster centers (if # of clusters > 1)
       // adapted from http://bl.ocks.org/mbostock/4237768  
@@ -300,8 +300,8 @@ d3.json("lda.json", function(error, data) {
           .attr("class", "mds-data2");
 
       //establish layout and vars for bar chart
-      var barDefault = barData.filter(function(d) { return d.Category == "Default" });
-      var barDefault2 = barDefault.sort(fancysort("Order"));
+      var barDefault2 = barData.filter(function(d) { return d.Category == "Default" });
+      //var barDefault2 = barDefault.sort(fancysort("Order"));
 
       var y = d3.scale.ordinal()
                       .domain(barDefault2.map(function(d) { return d.Term; }))
@@ -349,7 +349,7 @@ d3.json("lda.json", function(error, data) {
         .append("text")
         .attr("x", -5)
         .attr("class", "terms")
-        .attr("y", function(d) { return y(d.Term)+10; })
+        .attr("y", function(d) { return y(d.Term) + 12; })
         .attr("text-anchor", "end") // right align text - use 'middle' for center alignment
         .text(function(d) { return d.Term; })
         .on("mouseover", text_on)
@@ -411,8 +411,8 @@ function cluster_on(d) {
     .style("text-decoration", "underline")  
     .text(Freq + "% of tokens fall under cluster " + cluster);
 
-  var dat = d3.select("svg").selectAll(".bar-chart").data().filter(function(d) { return d.Category == "Cluster"+cluster });
-  var dat2 = dat.sort(fancysort("Order"));
+  var dat2 = d3.select("svg").selectAll(".bar-chart").data().filter(function(d) { return d.Category == "Cluster"+cluster });
+  //var dat2 = dat.sort(fancysort("Order"));
 
   var y = d3.scale.ordinal()
               .domain(dat2.map(function(d) { return d.Term; }))
@@ -438,7 +438,7 @@ function cluster_on(d) {
     .data(dat2)
     .transition()
       .attr("x", -5)
-      .attr("y", function(d) { return y(d.Term)+5; })
+      .attr("y", function(d) { return y(d.Term) + 12; })
       .attr("text-anchor", "end") // right align text - use 'middle' for center alignment
       .text(function(d) { return d.Term; });
 
@@ -489,8 +489,8 @@ function topic_on(d) {
       .style("text-decoration", "underline")  
       .text(Freq + "% of tokens fall under topic " + topics);
 
-    var dat = d3.select("svg").selectAll(".bar-chart").data().filter(function(d) { return d.Category == "Topic"+topics });
-    var dat2 = dat.sort(fancysort("Order"));
+    var dat2 = d3.select("svg").selectAll(".bar-chart").data().filter(function(d) { return d.Category == "Topic"+topics });
+    //var dat2 = dat.sort(fancysort("Order"));
 
     var y = d3.scale.ordinal()
                 .domain(dat2.map(function(d) { return d.Term; }))
@@ -519,7 +519,7 @@ function topic_on(d) {
       .data(dat2)
       .transition()
         .attr("x", -5)
-        .attr("y", function(d) { return y(d.Term)+5; })
+        .attr("y", function(d) { return y(d.Term) + 12; })
         .attr("text-anchor", "end") // right align text - use 'middle' for center alignment
         .text(function(d) { return d.Term; });
 
@@ -577,9 +577,9 @@ function cluster_off() {
 
     //go back to 'default' bar chart
     //Is there a better way to do this with .exit()?
-    var dat = d3.select("svg").selectAll(".bar-chart").data().filter(function(d) { return d.Category == "Default" });
+    var dat2 = d3.select("svg").selectAll(".bar-chart").data().filter(function(d) { return d.Category == "Default" });
 
-    var dat2 = dat.sort(fancysort("Order"));
+    //var dat2 = dat.sort(fancysort("Order"));
 
     var y = d3.scale.ordinal()
                 .domain(dat2.map(function(d) { return d.Term; }))
@@ -605,7 +605,7 @@ function cluster_off() {
       .data(dat2)
       .transition()
         .attr("x", -5)
-        .attr("y", function(d) { return y(d.Term)+5; })
+        .attr("y", function(d) { return y(d.Term) + 12; })
         .attr("text-anchor", "end") // right align text - use 'middle' for center alignment
         .text(function(d) { return d.Term; });
 
@@ -637,8 +637,8 @@ function topic_off() {
 
     //go back to 'default' bar chart
     //Is there a better way to do this with .exit()?
-    var dat = d3.select("svg").selectAll(".bar-chart").data().filter(function(d) { return d.Category == "Default" });
-    var dat2 = dat.sort(fancysort("Order"));
+    var dat2 = d3.select("svg").selectAll(".bar-chart").data().filter(function(d) { return d.Category == "Default" });
+    //var dat2 = dat.sort(fancysort("Order"));
 
     var y = d3.scale.ordinal()
                 .domain(dat2.map(function(d) { return d.Term; }))
@@ -664,7 +664,7 @@ function topic_off() {
       .data(dat2)
       .transition()
         .attr("x", -5)
-        .attr("y", function(d) { return y(d.Term)+5; })
+        .attr("y", function(d) { return y(d.Term) + 12; })
         .attr("text-anchor", "end") // right align text - use 'middle' for center alignment
         .text(function(d) { return d.Term; });
 
@@ -686,9 +686,9 @@ function text_on(d) {
         .style("font-weight", "bold");
 
     var Term = d.Term;
-    var dat = d3.select("svg").selectAll(".mds-data2").data().filter(function(d) { return d.Term == Term });
+    var dat2 = d3.select("svg").selectAll(".mds-data2").data().filter(function(d) { return d.Term == Term });
     //Make sure the topic ordering agrees with the ordering we used when the points were drawn
-    var dat2 = dat.sort(fancysort("Topic", decreasing = -1)); 
+    //var dat2 = dat.sort(fancysort("Topic", decreasing = -1)); 
     // # of topics
     var k = dat2.length  
 

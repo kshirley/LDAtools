@@ -177,7 +177,7 @@ getProbs <- function(word.id=numeric(), doc.id=numeric(), topic.id=numeric(), vo
   rownames(phi.hat) <- 1:K
   colnames(theta.hat) <- 1:K
   colnames(phi.hat) <- vocab
-  return(list(phi.hat=phi.hat, theta.hat=theta.hat, topic.id=topic.id, main.topic=main.topic))
+  return(list(phi.hat=phi.hat, theta.hat=theta.hat, topic.id=topic.id, main.topic=main.topic, topic.order=topic.o))
 }
 
 
@@ -372,7 +372,7 @@ KL <- function(x, y) {
 }
 
 
-#' Create JSON object from fitted topic model to visualize using d3
+#' Create a list of required objects from fitted topic model to visualize using d3
 #' 
 #' @param text A character vector of all training documents used to fit the LDA model
 #' @param doc.id An integer vector of the document ID numbers for each token occurrence in the data
@@ -385,8 +385,7 @@ KL <- function(x, y) {
 #' @param lambda A number in [0,1] to govern the weighted average that defines a given token's relevance
 #' for a given topic. Default to 0.5.
 #' @param n.terms The number of terms to display on the right panel of the interactive visualization for each topic
-#' @param file The name of the file to which to write the JSON object containing all the relevant information
-#' for the interactive visualization
+#' @param n.docs The number of example documents to display for each topic
 #'
 #' @export
 #' @examples
@@ -403,11 +402,16 @@ KL <- function(x, y) {
 #'
 #' # Run the function and write the JSON file:
 #' z <- jsviz(text=text, doc.id=APinput$doc.id, word.id=APinput$word.id, topic.id=APtopics$topics, vocab=APinput$vocab, 
-#'           K=30, k.clusters=1, lambda=0.5, n.terms=30, file="path/lda.json")
+#'           K=30, k.clusters=1, lambda=0.5, n.terms=30, n.docs=10)
+#' 
+#' # Write the list to a JSON object and place in a directory from which to serve the d3 webpage:
+#' library(RJSONIO)
+#' z.out <- toJSON(z)
+#' cat(z.out, file="path/lda.json")
 #' # Now serve index.html from path/
 
 jsviz <- function(text=character(), doc.id=integer(), word.id=integer(), topic.id=integer(), 
-                  vocab=character(), K=integer(), k.clusters=1, lambda=0.5, n.terms=30, file=character()) {
+                  vocab=character(), K=integer(), k.clusters=1, lambda=0.5, n.terms=30, n.docs=10) {
 
   # Set some relevant local variables and run a few basic checks:
   N <- length(word.id)
@@ -418,7 +422,7 @@ jsviz <- function(text=character(), doc.id=integer(), word.id=integer(), topic.i
   if (N != length(topic.id)) print ("Number of topic.id elements not equal to number of word.id elements")
 
   # Get estimated probability matrices theta and phi, and main.topic for each document:
-  dat <- getProbs(word.id, doc.id, topic.id, vocab, alpha=0.01, beta=0.01, sort.topics="byDocs", K=30)
+  dat <- getProbs(word.id, doc.id, topic.id, vocab, alpha=0.01, beta=0.01, sort.topics="byDocs", K=K)
 
   # re-set topic.id and name it 'topics':
   topics <- dat$topic.id
@@ -435,43 +439,37 @@ jsviz <- function(text=character(), doc.id=integer(), word.id=integer(), topic.i
 
   # Create a data.frame with the top M documents for each topic (with at least w.min words per document)
   # Data.frame will have two columns, first column is labels of the form "Topick" with k=topic id number:
-  M <- 20
-  w.min <- 5
-  top.docs <- rep("", M*K)
+  w.min <- 5 # minimum number of words per document for showing exmaple documents
+  top.docs <- rep("", n.docs*K)
   for (k in 1:K){
     sel <- dat$main.topic == k & words.per.doc > w.min
     o <- order(dat$theta.hat[sel, k], decreasing=TRUE)
-    top.docs[(k - 1)*M + 1:min(sum(sel), M)] <- text[sel][o][1:min(sum(sel), M)]
+    top.docs[(k - 1)*n.docs + 1:min(sum(sel), n.docs)] <- text[sel][o][1:min(sum(sel), n.docs)]
   }
 
   ### 1 ### The first main object to be returned by this function:
-  doc.df <- data.frame(Category=paste("Topic", rep(1:K, each=M), sep=""), Document=as.character(top.docs), stringsAsFactors=FALSE)
+  doc.df <- data.frame(Category=paste("Topic", rep(1:K, each=n.docs), sep=""), Document=as.character(top.docs), stringsAsFactors=FALSE)
 
   #calculate 'distance' between topics given the top 450 most frequent tokens
-  #tab <- table(tokens)
-  #pw <- tab/sum(tab)
-  #top <- names(tab)[order(tab, decreasing=FALSE) > 450] #add option to change this arbitrary cutoff?
-  avg <- norm(as.numeric(table(word.id)))
-  #a <- apply(dat$phi.hat, 2, sum)
-  #phi.hat <- rbind(dat$phi.hat, avg)
+  avg <- as.numeric(table(word.id))/length(word.id)
   phi.hat <- dat$phi.hat
-  # set distance computation cutoff at minimum of (500 tokens, # tokens that have a cumulative probability of 75%)
-  #dist.cutoff <- min(5000, min(which(cumsum(avg) > 0.75)))
-  dist.cutoff <- min(which(cumsum(avg) > 0.75))
-  phi <- phi.hat[, 1:dist.cutoff]  # we can do this because the columns of phi are still ordered in decreasing order of token frequency
+
+  # set distance computation cutoff at minimum number of tokens whose cumulative probability exceeds 80%
+  o <- order(table(word.id), decreasing=TRUE) # order tokens by overall frequency
+  dist.cutoff <- min(which(cumsum(avg[o]) > 0.80))
+  phi <- phi.hat[, o[1:dist.cutoff]]
   d <- dist(phi, KL)
-  fit <- cmdscale(d, k=2)
-  x <- fit[,1]
-  y <- fit[,2]
+  fit.cmd <- cmdscale(d, k=2)
+  x <- fit.cmd[,1]
+  y <- fit.cmd[,2]
   lab <- gsub("Topic", "", names(x))
   loc.df <- data.frame(x, y, topics=lab, stringsAsFactors=FALSE)
 
-  tab.maintopic <- table(dat$main.topic)
-  p.topics <- tab.maintopic/D
+  # compute % of tokens that come from each topic:
+  p.topics <- table(topics)/length(topics)
   topics.df <- data.frame(topics=1:K, Freq=as.numeric(p.topics*100))
 
   # join the MDS location data.frame with the Topic Frequency data.frame
-  #mds.df <- plyr::join(loc.df, topics.df, by="topics")
   mds.df <- data.frame(loc.df, Freq=topics.df[, "Freq"])  
 
   # workaround errors if no clustering is done (ie, input$kmeans == 1)
@@ -498,7 +496,6 @@ jsviz <- function(text=character(), doc.id=integer(), word.id=integer(), topic.i
   ### The ranking of words under a cluster is done via a similar weighted average (summing over the relevant topics)
 
   phi.t <- t(dat$phi.hat)
-  #pws <- as.numeric(pw[rownames(phi.t)]) # reorder frequencies to match the ordering of phi
   weight <- lambda*log(phi.t) + (1 - lambda)*log(phi.t/avg) 
     
   #get the most relevant terms for each topic:
@@ -521,8 +518,6 @@ jsviz <- function(text=character(), doc.id=integer(), word.id=integer(), topic.i
   } else {
     for (i in 1:k.clusters) {
       # grab topics that belong to the current cluster
-      #topicz <- subset(topic.cl.ID, cluster == i)$topics
-      #topicnames <- paste0("Topic", topicz)
       topicz <- which(topic.cl.ID[, "cluster"] == i)
       sub.phi <- phi.t[, topicz]
       sub.theta <- dat$theta.hat[, topicz]
@@ -530,8 +525,6 @@ jsviz <- function(text=character(), doc.id=integer(), word.id=integer(), topic.i
       if (!is.null(dim(sub.phi))) {
         sub.phi <- apply(t(sub.phi)*t.weights[topicz], 2, sum)  # weighted by topic term frequency
         sub.theta <- apply(t(sub.theta)*t.weights[topicz], 2, sum)  # weighted by topic term frequency
-        #sub.phi <- apply(sub.phi, 1, sum)
-        #sub.theta <- apply(sub.theta, 1, sum)
       }
       weight <- lambda*log(sub.phi) + (1 - lambda)*log(sub.phi/avg)
       o <- order(weight, decreasing=TRUE)
@@ -571,18 +564,13 @@ jsviz <- function(text=character(), doc.id=integer(), word.id=integer(), topic.i
   all.df$Total <- as.integer(totals[all.df$Term])
     
   # relative frequency (in percentages) over topics for each possible term
-  #probs <- t(apply(counts, 1, function(x) as.integer(100*x/sum(x))))
   probs <- t(apply(counts, 1, function(x) round(100*x/sum(x)))) # round() gets closer to 100, although sometimes over
   topic.probs <- data.frame(probs, stringsAsFactors=FALSE)
   topic.probs$Term <- rownames(probs)
   topic.table <- data.frame(Term = rep(rownames(probs), K), Topic=rep(1:K, each=length(all.words)),
-                            value = as.numeric(as.matrix(topic.probs[, 1:K])))
-  #topic.table$Topic <- as.numeric(gsub("X", "", topic.table$Topic))
-  names(topic.table) <- gsub("value", "Freq", names(topic.table))
-  z <- list(mdsDat=mds.df, mdsDat2=topic.table, barDat=all.df, docDat=doc.df,
-            centers=centers, nClust=k.clusters)
-  z.out <- toJSON(z)
-  cat(z.out, file=file)
+                            Freq = as.numeric(as.matrix(topic.probs[, 1:K])))
+  return(list(mdsDat=mds.df, mdsDat2=topic.table, barDat=all.df, docDat=doc.df,
+            centers=centers, nClust=k.clusters))
 }
 
 

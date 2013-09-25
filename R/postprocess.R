@@ -422,7 +422,7 @@ jsviz <- function(text=character(), doc.id=integer(), word.id=integer(), topic.i
   if (N != length(topic.id)) print ("Number of topic.id elements not equal to number of word.id elements")
 
   # Get estimated probability matrices theta and phi, and main.topic for each document:
-  dat <- getProbs(word.id, doc.id, topic.id, vocab, alpha=0.01, beta=0.01, sort.topics="byDocs", K=K)
+  dat <- getProbs(word.id, doc.id, topic.id, vocab, alpha=0.01, beta=0.01, sort.topics="byTerms", K=K)
 
   # re-set topic.id and name it 'topics':
   topics <- dat$topic.id

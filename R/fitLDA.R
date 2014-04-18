@@ -3,7 +3,7 @@
 #' @description This function implements the Gibbs sampling method described by Griffiths and Steyvers (2004). The Gibbs sampler
 #' portion of the function is a call to C code. Note that we only return the latent topic assignments (for each token) from the last iteration.
 #' Thus, memory limitations aren't really an issue. However, the run time is O(num.chains*n.iter*N*k) where \code{n.chains} is number of MCMC chains,
-#' \code{n.iter} is the number of iterations, N is the total number of tokens in teh data, and k is the number of topics.
+#' \code{n.iter} is the number of iterations, N is the total number of tokens in the data, and k is the number of topics.
 #' It is possible to resume a Gibbs sampler from a previous fit
 #' by using the topics from that fit to initiate the next set of iterations using \code{topics.init}.
 #'
@@ -20,7 +20,7 @@
 #' @return A list of length two. The first element is the sampled latent topic value from the last iteration (for each token).
 #' The second element is a vector with the log-likelihood values for every iteration of the gibbs sampler. 
 #' 
-#' @references Griffiths and Steyvers (2004). Finding Scientific Topics. Proceedings of the National Academy of Sciences. 
+#' @references Griffiths and Steyvers (2004). Finding Scientific Topics. Proceedings of the National Academy of Sciences. 101: 5228-5235.
 #'
 #' @export
 #' @useDynLib LDAviz

@@ -14,6 +14,10 @@ R package for fitting and visualizing topic models.
 
 ### Run AP example locally:
 
+Make sure you have the following packages installed:
+
+```install.packages(c("plyr","reshape", "proxy", "shiny"))```
+
 ```library(shiny); runApp(system.file('shiny', 'hover', package='LDAviz'))```
 
 More documentation to come...

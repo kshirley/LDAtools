@@ -2,9 +2,8 @@
 \alias{fitLDA}
 \title{Fit LDA model via Gibbs sampler}
 \usage{
-  fitLDA(word.id = integer(), doc.id = integer(), k = 10,
-    n.chains = 1, n.iter = 1000, topics.init = NULL,
-    alpha = 0.01, beta = 0.01)
+fitLDA(word.id = integer(), doc.id = integer(), k = 10, n.chains = 1,
+  n.iter = 1000, topics.init = NULL, alpha = 0.01, beta = 0.01)
 }
 \arguments{
   \item{word.id}{Unique token ID. Can be taken directly
@@ -31,26 +30,26 @@
   \item{beta}{Dirichlet hyperparameter}
 }
 \value{
-  A list of length two. The first element is the sampled
-  latent topic value from the last iteration (for each
-  token). The second element is a vector with the
-  log-likelihood values for every iteration of the gibbs
-  sampler.
+A list of length two. The first element is the sampled
+latent topic value from the last iteration (for each
+token). The second element is a vector with the
+log-likelihood values for every iteration of the gibbs
+sampler.
 }
 \description{
-  This function implements the Gibbs sampling method
-  described by Griffiths and Steyvers (2004). The Gibbs
-  sampler portion of the function is a call to C code. Note
-  that we only return the latent topic assignments (for
-  each token) from the last iteration. Thus, memory
-  limitations aren't really an issue. However, the run time
-  is O(num.chains*n.iter*N*k) where \code{n.chains} is
-  number of MCMC chains, \code{n.iter} is the number of
-  iterations, N is the total number of tokens in teh data,
-  and k is the number of topics. It is possible to resume a
-  Gibbs sampler from a previous fit by using the topics
-  from that fit to initiate the next set of iterations
-  using \code{topics.init}.
+This function implements the Gibbs sampling method
+described by Griffiths and Steyvers (2004). The Gibbs
+sampler portion of the function is a call to C code. Note
+that we only return the latent topic assignments (for each
+token) from the last iteration. Thus, memory limitations
+aren't really an issue. However, the run time is
+O(num.chains*n.iter*N*k) where \code{n.chains} is number of
+MCMC chains, \code{n.iter} is the number of iterations, N
+is the total number of tokens in the data, and k is the
+number of topics. It is possible to resume a Gibbs sampler
+from a previous fit by using the topics from that fit to
+initiate the next set of iterations using
+\code{topics.init}.
 }
 \examples{
 data(APinput)
@@ -58,7 +57,8 @@ data(APinput)
 \dontrun{o <- fitLDA(APinput$word.id, APinput$doc.id, k=20)}
 }
 \references{
-  Griffiths and Steyvers (2004). Finding Scientific Topics.
-  Proceedings of the National Academy of Sciences.
+Griffiths and Steyvers (2004). Finding Scientific Topics.
+Proceedings of the National Academy of Sciences. 101:
+5228-5235.
 }
 

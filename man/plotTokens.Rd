@@ -2,8 +2,8 @@
 \alias{plotTokens}
 \title{Plot probable tokens for a given topic}
 \usage{
-  plotTokens(phi = vector(), vocab = character(),
-    n.tokens = 20, lambda = 0.5, p = vector(), ...)
+plotTokens(phi = vector(), vocab = character(), n.tokens = 20,
+  lambda = 0.5, p = vector(), ...)
 }
 \arguments{
   \item{phi}{numeric vector with the probability of each
@@ -24,22 +24,21 @@
   \item{...}{additional arguments to the plot() function}
 }
 \description{
-  Plot probable tokens for a given topic
+Plot probable tokens for a given topic
 }
 \details{
-  The ranking of tokens within topics is based on a
-  weighted average of the probability of a token (given the
-  topic) and the lift, where the lift of a token is defined
-  as the probability of the token (given the topic) divided
-  by the marginal probability of the token (i.e. across all
-  topics). The ranking that determines the top
-  \code{n.token} tokens to plot is simply \code{lambda *
-  log(p(token)) + (1 - lambda) * log(p(token |
-  topic)/p(token))}.
+The ranking of tokens within topics is based on a weighted
+average of the probability of a token (given the topic) and
+the lift, where the lift of a token is defined as the
+probability of the token (given the topic) divided by the
+marginal probability of the token (i.e. across all topics).
+The ranking that determines the top \code{n.token} tokens
+to plot is simply \code{lambda * log(p(token)) + (1 -
+lambda) * log(p(token | topic)/p(token))}.
 
-  Note: the ordering of \code{phi}, \code{vocab}, and
-  \code{p} must be the same (i.e. the nth element of each
-  vector must correspond to the same token)
+Note: the ordering of \code{phi}, \code{vocab}, and
+\code{p} must be the same (i.e. the nth element of each
+vector must correspond to the same token)
 }
 \examples{
 data(APinput)

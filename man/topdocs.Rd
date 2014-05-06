@@ -2,7 +2,7 @@
 \alias{topdocs}
 \title{Find representative documents for each topic}
 \usage{
-  topdocs(theta, docs, n = 30)
+topdocs(theta, docs, n = 30)
 }
 \arguments{
   \item{theta}{Matrix of document-topic probabilities.
@@ -16,7 +16,7 @@
   topic.}
 }
 \description{
-  Find representative documents for each topic
+Find representative documents for each topic
 }
 \examples{
 \dontrun{

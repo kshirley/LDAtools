@@ -2,8 +2,7 @@
 \alias{plotLoglik}
 \title{Traceplot of log-likelihood.}
 \usage{
-  plotLoglik(data = matrix(), zoom = FALSE, prop = 0.5,
-    start = 0)
+plotLoglik(data = matrix(), zoom = FALSE, prop = 0.5, start = 0)
 }
 \arguments{
   \item{data}{a matrix with log-likelihood values. Each
@@ -20,13 +19,13 @@
   before these chains.}
 }
 \description{
-  Trace plot of the log-likelihood (the x-axis is MCMC
-  iteration, and the y-axis is the log-likelihood). The
-  MCMC algorithm has converged when this plot levels out
-  and the log-likelihood time series plot looks like white
-  noise. If the log-likelihood is still increasing at the
-  last iteration, you should go back and run the algorithm
-  longer (using \code{fitLDA}.)
+Trace plot of the log-likelihood (the x-axis is MCMC
+iteration, and the y-axis is the log-likelihood). The MCMC
+algorithm has converged when this plot levels out and the
+log-likelihood time series plot looks like white noise. If
+the log-likelihood is still increasing at the last
+iteration, you should go back and run the algorithm longer
+(using \code{fitLDA}.)
 }
 \examples{
 one.chain <- matrix(rnorm(1000, mean=-500, sd=100), ncol=1) #hopefully our logliklihood is essentially random noise!

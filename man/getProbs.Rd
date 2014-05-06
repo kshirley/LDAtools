@@ -2,11 +2,9 @@
 \alias{getProbs}
 \title{Compute topic-word and document-topic probability distribution matrices, and re-label topic indices}
 \usage{
-  getProbs(word.id = numeric(), doc.id = numeric(),
-    topic.id = numeric(), vocab = character(),
-    alpha = 0.01, beta = 0.01,
-    sort.topics = c("None", "byDocs", "byTerms"),
-    K = integer())
+getProbs(word.id = numeric(), doc.id = numeric(), topic.id = numeric(),
+  vocab = character(), alpha = 0.01, beta = 0.01,
+  sort.topics = c("None", "byDocs", "byTerms"), K = integer())
 }
 \arguments{
   \item{word.id}{a numeric vector with the token id of each
@@ -34,31 +32,30 @@
   topic.}
 }
 \value{
-  A list of two matrices and one vector. The first matrix
-  is, \code{phi.hat}, contains the distribution over tokens
-  for each topic, where the rows correspond to topics. The
-  second matrix, \code{theta.hat}, contains the
-  distribution over topics for each document, where the
-  rows correspond to documents. The vector returned by the
-  function, \code{topic.id}, is the vector of sampled
-  topics from the LDA fit, with topic indices re-labeled in
-  decreasing order of frequency by the \code{sort.topics}
-  argument.
+A list of two matrices and one vector. The first matrix is,
+\code{phi.hat}, contains the distribution over tokens for
+each topic, where the rows correspond to topics. The second
+matrix, \code{theta.hat}, contains the distribution over
+topics for each document, where the rows correspond to
+documents. The vector returned by the function,
+\code{topic.id}, is the vector of sampled topics from the
+LDA fit, with topic indices re-labeled in decreasing order
+of frequency by the \code{sort.topics} argument.
 }
 \description{
-  This function assumes the ordering of \code{word.id},
-  \code{doc.id}, \code{topic.id} matters! That is, the
-  first element of \code{word.id} corresponds to the first
-  element of \code{doc.id} which corresponds to the first
-  element of \code{topic.id}. Similarly, the second element
-  of tokens corresponds to the second element of
-  \code{doc.id} which corresponds to the second element of
-  \code{topic.id} (and so on). Also, the ordering of the
-  elements of \code{vocab} are assumed to correspond to the
-  elements of \code{word.id}, so that the first element of
-  \code{vocab} is the token with \code{word.id} equal to 1,
-  the second element of \code{vocab} is the token with
-  \code{word.id} equal to 2, etc.
+This function assumes the ordering of \code{word.id},
+\code{doc.id}, \code{topic.id} matters! That is, the first
+element of \code{word.id} corresponds to the first element
+of \code{doc.id} which corresponds to the first element of
+\code{topic.id}. Similarly, the second element of tokens
+corresponds to the second element of \code{doc.id} which
+corresponds to the second element of \code{topic.id} (and
+so on). Also, the ordering of the elements of \code{vocab}
+are assumed to correspond to the elements of
+\code{word.id}, so that the first element of \code{vocab}
+is the token with \code{word.id} equal to 1, the second
+element of \code{vocab} is the token with \code{word.id}
+equal to 2, etc.
 }
 \examples{
 data(APinput)

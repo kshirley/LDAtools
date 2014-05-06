@@ -1,27 +1,21 @@
 Package: LDAtools
 Title: Tools to fit a topic model using Latent Dirichlet Allocation (LDA)
 Version: 0.1
-Authors@R: c(person("Carson", "Sievert", role = "aut", email = "cpsievert1@gmail.com"), 
-             person("Kenny", "Shirley", role =  c("aut", "cre"), email = "kshirley@research.att.com"))
+Authors@R: c(person("Carson", "Sievert", role = "aut", email =
+    "cpsievert1@gmail.com"), person("Kenny", "Shirley", role = c("aut", "cre"),
+    email = "kshirley@research.att.com"))
 Description: This package implements a collapsed Gibbs Sampler algorithm to fit
-    a topic model to a set of unstructured text documents. It contains three basic groups of
-    functions: (1) pre-processing of unstructured text, including
-    substitutions, tokenization, and stemming, (2) fitting the Latent Dirichlet
-    Allocation (LDA) topic model to training data and making model-based
-    predictions on test data, and (3) visualizing and summarizing the fitted
-    model.
+    a topic model to a set of unstructured text documents. It contains three
+    basic groups of functions: (1) pre-processing of unstructured text,
+    including substitutions, tokenization, and stemming, (2) fitting the Latent
+    Dirichlet Allocation (LDA) topic model to training data and making
+    model-based predictions on test data, and (3) visualizing and summarizing
+    the fitted model.
 Depends:
     R (>= 2.15),
     SnowballC
-License: MIT
+License: 
 Imports:
     foreach
-License: 
 Suggests:
     shiny
-Collate:
-    'help.r'
-    'preprocess.R'
-    'fitLDA.R'
-    'postprocess.R'
-    'utils.R'

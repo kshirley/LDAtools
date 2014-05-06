@@ -1,11 +1,10 @@
 \name{jsviz}
 \alias{jsviz}
-\title{Create JSON object from fitted topic model to visualize using d3}
+\title{Create a list of required objects from fitted topic model to visualize using d3}
 \usage{
-  jsviz(text = character(), doc.id = integer(),
-    word.id = integer(), topic.id = integer(),
-    vocab = character(), K = integer(), k.clusters = 1,
-    lambda = 0.5, n.terms = 30, file = character())
+jsviz(text = character(), doc.id = integer(), word.id = integer(),
+  topic.id = integer(), vocab = character(), K = integer(),
+  k.clusters = 1, lambda = 0.5, n.terms = 30, n.docs = 10)
 }
 \arguments{
   \item{text}{A character vector of all training documents
@@ -37,13 +36,12 @@
   right panel of the interactive visualization for each
   topic}
 
-  \item{file}{The name of the file to which to write the
-  JSON object containing all the relevant information for
-  the interactive visualization}
+  \item{n.docs}{The number of example documents to display
+  for each topic}
 }
 \description{
-  Create JSON object from fitted topic model to visualize
-  using d3
+Create a list of required objects from fitted topic model
+to visualize using d3
 }
 \examples{
 data(APinput, package="ldatools")
@@ -58,7 +56,12 @@ text <- APcorpus[APinput$category == 0]
 
 # Run the function and write the JSON file:
 z <- jsviz(text=text, doc.id=APinput$doc.id, word.id=APinput$word.id, topic.id=APtopics$topics, vocab=APinput$vocab,
-          K=30, k.clusters=1, lambda=0.5, n.terms=30, file="path/lda.json")
+          K=30, k.clusters=1, lambda=0.5, n.terms=30, n.docs=10)
+
+# Write the list to a JSON object and place in a directory from which to serve the d3 webpage:
+library(RJSONIO)
+z.out <- toJSON(z)
+cat(z.out, file="path/lda.json")
 # Now serve index.html from path/
 }
 

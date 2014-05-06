@@ -2,9 +2,8 @@
 \alias{predictLDA}
 \title{Estimate topics for new documents using a Gibbs sampler}
 \usage{
-  predictLDA(word.id = integer(), doc.id = integer(),
-    k = 10, n.chains = 1, n.iter = 1000,
-    topics.init = NULL, alpha = 0.01, phi)
+predictLDA(word.id = integer(), doc.id = integer(), k = 10,
+  n.chains = 1, n.iter = 1000, topics.init = NULL, alpha = 0.01, phi)
 }
 \arguments{
   \item{word.id}{Unique token ID. Can be taken directly
@@ -33,20 +32,19 @@
   \code{T} topics in the previously fit topic model.}
 }
 \value{
-  A list of length two. The first element is the sampled
-  latent topic value from the last iteration (for each
-  token). The second element is a vector with the
-  log-likelihood values for every iteration of the Gibbs
-  sampler.
+A list of length two. The first element is the sampled
+latent topic value from the last iteration (for each
+token). The second element is a vector with the
+log-likelihood values for every iteration of the Gibbs
+sampler.
 }
 \description{
-  This function estimates topic proportions for a new
-  corpus of documents, using the the vocabulary and the
-  topic-token probability distributions from a previously
-  fit LDA topic model. The function samples the latent
-  topics for each token in the new corpus using a Gibbs
-  sampler, and returns the latent topics from the last
-  iteration.
+This function estimates topic proportions for a new corpus
+of documents, using the the vocabulary and the topic-token
+probability distributions from a previously fit LDA topic
+model. The function samples the latent topics for each
+token in the new corpus using a Gibbs sampler, and returns
+the latent topics from the last iteration.
 }
 \examples{
 data(APinput)

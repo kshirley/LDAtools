@@ -1,9 +1,9 @@
 \docType{package}
-\name{ldatools}
-\alias{ldatools}
-\alias{ldatools-package}
-\title{ldatools}
+\name{LDAtools}
+\alias{LDAtools}
+\alias{LDAtools-package}
+\title{LDAtools}
 \description{
-  ldatools
+LDAtools
 }
 

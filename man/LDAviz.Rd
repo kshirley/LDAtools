@@ -4,6 +4,6 @@
 \alias{LDAviz-package}
 \title{LDAviz}
 \description{
-  LDAviz
+LDAviz
 }
 

@@ -1,4 +1,4 @@
 library(testthat)
-library(LDAviz)
+library(LDAtools)
 
-test_package("LDAviz")
+test_package("LDAtools")

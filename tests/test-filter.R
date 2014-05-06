@@ -1,5 +1,5 @@
 library(testthat)
-library(LDAviz)
+library(LDAtools)
 
 input1 <- filter(data=text, exact=exact, partial=partial, subs=subs, stopwords=stopwords, verbose=FALSE, quiet=TRUE)
 input2 <- filter(data=text, exact=exact, partial=partial, subs=subs, stopwords=stopwords, verbose=FALSE, quiet=FALSE)

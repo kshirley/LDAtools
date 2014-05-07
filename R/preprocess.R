@@ -32,12 +32,6 @@
 #' @param cutoff The minimum number of times a token must appear in the corpus 
 #' in order to be included in the vocabulary.
 #'
-#' @param verbose logical. If set to TRUE the function will retain the indices 
-#' of the elements of \code{exact} and \code{partial} that were matched. 
-#' For instance, if a document exactly matches the third element of 
-#' \code{exact}, then the corresponding value of \code{category} will be 3, 
-#' if \code{verbose = TRUE}
-#'
 #' @param quiet logical. Should a summary of the preprocessing steps be 
 #' printed to the screen?
 #'
@@ -79,7 +73,7 @@
 #' data(APcorpus)
 #' data(stopwords)
 #' input <- preprocess(data=APcorpus, exact=NULL, partial=NULL, subs=NULL, 
-#'                     stopwords=stopwords, cutoff=5, verbose=FALSE,
+#'                     stopwords=stopwords, cutoff=5,
 #'                     quiet=FALSE, stem=FALSE, hash="ent")
 
 preprocess <- function(data, exact=NULL, partial=NULL, subs=NULL, 
@@ -87,6 +81,11 @@ preprocess <- function(data, exact=NULL, partial=NULL, subs=NULL,
                        stem=FALSE, hash="ent") {
   D.orig <- length(data)
   
+  # Print part 1:
+  if (!quiet) {
+  	cat("Filtering documents:\n\n")
+  }
+
   # track and get rid of NA/blank documents:
   sel.na <- as.numeric(is.na(data))
   sel.blank <- as.numeric(data == "" & !is.na(data))
@@ -94,15 +93,23 @@ preprocess <- function(data, exact=NULL, partial=NULL, subs=NULL,
     count.na <- sum(sel.na)
     count.blank <- sum(sel.blank, na.rm=TRUE)
     cat(paste0(sprintf("%.1f", round(count.na/D.orig, 3)*100), "% (",
-               count.na,"/", D.orig, ") of notes are NA"), "\n")
+               count.na,"/", D.orig, ") of documents are NA"), "\n")
     cat(paste0(sprintf("%.1f", round(count.blank/D.orig, 3)*100), "% (",
-               count.blank,"/", D.orig, ") of notes are blank"), "\n")
+               count.blank,"/", D.orig, ") of documents are blank"), "\n")
   }
   
   # Discard documents that exactly match elements of 'exact' or contain 
   # strings that are elements of 'partial':
-  sel.exact <- flag.exact(data, exact, verbose, quiet)$category
-  sel.partial <- flag.partial(data, partial, verbose, quiet)$category
+  sel.exact <- flag.exact(data, exact, verbose=FALSE, quiet)$category
+  sel.partial <- flag.partial(data, partial, verbose=FALSE, quiet)$category
+  if (!quiet) {
+    cat(paste0(sprintf("%.1f", round(sum(sel.exact)/D.orig, 3)*100), "% (",
+               sum(sel.exact), "/", D.orig, ") of documents discarded
+               as exact matches"), "\n")
+    cat(paste0(sprintf("%.1f", round(sum(sel.partial)/D.orig, 3)*100), "% (",
+               sum(sel.partial), "/", D.orig, ") of documents discarded
+               as partial matches"), "\n")
+  }
   
   # Discard the filtered documents and track the category that each one 
   # belonged to:
@@ -120,23 +127,35 @@ preprocess <- function(data, exact=NULL, partial=NULL, subs=NULL,
   # Print out progress to console:
   if (!quiet) {
     cat(paste0(sprintf("%.1f", 100 - round(D/D.orig, 3)*100), 
-               "% of notes removed; that is, ", D, " out of ", 
-               D.orig, " docs remaining"), "\n")  
+               "% of documents discarded; that is, ", D, " out of ", 
+               D.orig, " documents remaining"), "\n")  
   }
   
   # coerce documents to lowercase:
+  if (!quiet) {
+  	cat("\nForcing documents to lowercase\n\n")
+  }
   temp <- tolower(dat)
 
   # make substitutions:
   if (!is.null(subs)) {
+    if (!quiet) {
+  	  cat("Performing regular expression substitutions\n\n")
+    }
     n.subs <- length(subs)/2
     if (n.subs != floor(n.subs)){ 
       warning("The length of the subs object should be divisible by 2.")
     }
-    for (i in 1:n.subs) temp <- gsub(subs[i*2-1], subs[i*2], temp)
+    for (i in 1:n.subs) {
+      temp <- gsub(subs[i*2-1], subs[i*2], temp)
+    }
   }
 
   # handle the punctuation:
+  if (!quiet) {
+  	cat("Tokenizing documents by separating on whitespace and punctuation\n\n")
+  }
+
   # remove apostrophes
   temp <- gsub("\'", "", temp)
   # change any punctuation to single space
@@ -153,6 +172,7 @@ preprocess <- function(data, exact=NULL, partial=NULL, subs=NULL,
   token.vec <- unlist(wl)
   
   # throw out 1-letter terms (but keep single-digit terms)
+  if (!quiet) cat("Automatically discard 1-letter terms\n\n")
   token.vec <- token.vec[nchar(token.vec) > 1 | token.vec %in% 0:9]
   
   # Form a table of terms:
@@ -164,20 +184,23 @@ preprocess <- function(data, exact=NULL, partial=NULL, subs=NULL,
 
   # remove stopwords:
   if (!is.null(stopwords)) {
+    if (!quiet) {
+      cat("Removing stop words from vocabulary\n")
+    }
     stops <- names(term.table) %in% stopwords
     n.tokens.removed <- sum(term.table[stops])
     term.table <- term.table[!stops]
     if (!quiet) {
-      cat(paste0("Removed ", sum(stops), " stopwords from provided list of ", 
-                 length(stopwords), " stopwords"), "\n")
+      cat(paste0("Removed ", sum(stops), " stop words from provided list of ", 
+                 length(stopwords), " stop words"), "\n")
       cat(paste0("Removed ", n.tokens.removed, 
-                 " stopword occurrences from data"), "\n")
+                 " stop word occurrences from data"), "\n")
       cat(paste0("Total Remaining Terms: ", length(term.table)), "\n")
       cat(paste0("Total Remaining Tokens: ", sum(term.table)), "\n")
     }
   }
   
-  # Remove terms that occur fewer than 'cutoff' times from the vocabulary:
+  # Remove terms that occur fewer than cutoff times from the vocabulary:
   pred.tab <- term.table[term.table >= cutoff]
   vocab <- names(pred.tab)
   if (!quiet) {
@@ -204,6 +227,11 @@ preprocess <- function(data, exact=NULL, partial=NULL, subs=NULL,
   # i.e. substitutions, punctuation, stopwords, or the cutoff setting 
   # caused the document to contain zero tokens in the vocabulary:
   category[category == 0][(1:D) %in% unique(doc.id) == FALSE] <- -1
+  if (!quiet) {
+  	cat(paste0(sum(category == -1), "additional documents removed because
+  	           they consisted entirely of punctuation or rare terms
+  	           that are not in the vocabulary."))
+  }
   
   # every document must have at least one token in the vocabulary:
   doc.id <- match(doc.id, unique(doc.id))

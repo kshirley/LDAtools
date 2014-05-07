@@ -83,7 +83,7 @@ preprocess <- function(data, exact=NULL, partial=NULL, subs=NULL,
   
   # Print part 1:
   if (!quiet) {
-  	cat("Filtering documents:\n\n")
+  	cat("[1] Filtering documents:\n\n")
   }
 
   # track and get rid of NA/blank documents:
@@ -92,9 +92,9 @@ preprocess <- function(data, exact=NULL, partial=NULL, subs=NULL,
   if (!quiet) {
     count.na <- sum(sel.na)
     count.blank <- sum(sel.blank, na.rm=TRUE)
-    cat(paste0(sprintf("%.1f", round(count.na/D.orig, 3)*100), "% (",
+    cat(paste0(sprintf("  %.1f", round(count.na/D.orig, 3)*100), "% (",
                count.na,"/", D.orig, ") of documents are NA"), "\n")
-    cat(paste0(sprintf("%.1f", round(count.blank/D.orig, 3)*100), "% (",
+    cat(paste0(sprintf("  %.1f", round(count.blank/D.orig, 3)*100), "% (",
                count.blank,"/", D.orig, ") of documents are blank"), "\n")
   }
   
@@ -103,12 +103,12 @@ preprocess <- function(data, exact=NULL, partial=NULL, subs=NULL,
   sel.exact <- flag.exact(data, exact, verbose=FALSE, quiet)$category
   sel.partial <- flag.partial(data, partial, verbose=FALSE, quiet)$category
   if (!quiet) {
-    cat(paste0(sprintf("%.1f", round(sum(sel.exact)/D.orig, 3)*100), "% (",
-               sum(sel.exact), "/", D.orig, ") of documents discarded
-               as exact matches"), "\n")
-    cat(paste0(sprintf("%.1f", round(sum(sel.partial)/D.orig, 3)*100), "% (",
-               sum(sel.partial), "/", D.orig, ") of documents discarded
-               as partial matches"), "\n")
+    cat(paste0(sprintf("  %.1f", round(sum(sel.exact)/D.orig, 3)*100), "% (",
+               sum(sel.exact), "/", D.orig, ") of documents discarded as ", 
+               "exact matches"), "\n")
+    cat(paste0(sprintf("  %.1f", round(sum(sel.partial)/D.orig, 3)*100), "% (",
+               sum(sel.partial), "/", D.orig, ") of documents discarded as ",
+               "partial matches"), "\n")
   }
   
   # Discard the filtered documents and track the category that each one 
@@ -126,22 +126,22 @@ preprocess <- function(data, exact=NULL, partial=NULL, subs=NULL,
 
   # Print out progress to console:
   if (!quiet) {
-    cat(paste0(sprintf("%.1f", 100 - round(D/D.orig, 3)*100), 
-               "% of documents discarded; that is, ", D, " out of ", 
+    cat(paste0(sprintf("  %.1f", 100 - round(D/D.orig, 3)*100), 
+               "% of documents discarded\n", D, " out of ", 
                D.orig, " documents remaining"), "\n")  
   }
   
   # coerce documents to lowercase:
   if (!quiet) {
-  	cat("\nForcing documents to lowercase\n\n")
+  	cat("\n[2] Forcing documents to lowercase\n\n")
   }
   temp <- tolower(dat)
 
   # make substitutions:
+  if (!quiet) {
+  	cat("[3] Performing regular expression substitutions\n\n")
+  }
   if (!is.null(subs)) {
-    if (!quiet) {
-  	  cat("Performing regular expression substitutions\n\n")
-    }
     n.subs <- length(subs)/2
     if (n.subs != floor(n.subs)){ 
       warning("The length of the subs object should be divisible by 2.")
@@ -149,11 +149,21 @@ preprocess <- function(data, exact=NULL, partial=NULL, subs=NULL,
     for (i in 1:n.subs) {
       temp <- gsub(subs[i*2-1], subs[i*2], temp)
     }
+    if (!quiet) {
+  	  cat(paste0("  Performed ", n.subs, 
+  	             " regular expression substitutions.\n"))
+    }
+  } else {
+    if (!quiet) {
+  	  cat(paste0("  Performed 0 regular expression substitutions.\n"))
+    }  	
   }
+  
 
   # handle the punctuation:
   if (!quiet) {
-  	cat("Tokenizing documents by separating on whitespace and punctuation\n\n")
+  	cat(paste0("\nTokenizing documents by separating on whitespace and ",
+  	    "punctuation\n\n"))
   }
 
   # remove apostrophes
@@ -180,23 +190,23 @@ preprocess <- function(data, exact=NULL, partial=NULL, subs=NULL,
   term.table <- sort(term.table, decreasing=TRUE)
   
   if (!quiet) cat(paste("Total # of Terms: ", length(term.table), sep=""), "\n")
-  if (!quiet) cat(paste("Total # of Tokens: ", sum(term.table), sep=""), "\n")
+  if (!quiet) cat(paste("Total # of Tokens: ", sum(term.table), sep=""), "\n\n")
 
   # remove stopwords:
   if (!is.null(stopwords)) {
     if (!quiet) {
-      cat("Removing stop words from vocabulary\n")
+      cat("Removing stop words from vocabulary\n\n")
     }
     stops <- names(term.table) %in% stopwords
     n.tokens.removed <- sum(term.table[stops])
     term.table <- term.table[!stops]
     if (!quiet) {
-      cat(paste0("Removed ", sum(stops), " stop words from provided list of ", 
+      cat(paste0("  Removed ", sum(stops), " stop words from provided list of ", 
                  length(stopwords), " stop words"), "\n")
-      cat(paste0("Removed ", n.tokens.removed, 
+      cat(paste0("  Removed ", n.tokens.removed, 
                  " stop word occurrences from data"), "\n")
-      cat(paste0("Total Remaining Terms: ", length(term.table)), "\n")
-      cat(paste0("Total Remaining Tokens: ", sum(term.table)), "\n")
+      cat(paste0("  Total Remaining Terms: ", length(term.table)), "\n")
+      cat(paste0("  Total Remaining Tokens: ", sum(term.table)), "\n")
     }
   }
   
@@ -204,11 +214,12 @@ preprocess <- function(data, exact=NULL, partial=NULL, subs=NULL,
   pred.tab <- term.table[term.table >= cutoff]
   vocab <- names(pred.tab)
   if (!quiet) {
-    cat(paste0("Removing ", sum(term.table < cutoff), 
+    cat("\nRemoving rare terms from vocabulary\n")
+    cat(paste0("  Removed ", sum(term.table < cutoff), 
                " terms that appear less than ", cutoff, 
                " times in the data"), "\n")
-    cat(paste0("Total Remaining Terms: ", length(pred.tab)), "\n")
-    cat(paste0("Total Remaining Tokens: ", sum(pred.tab)), "\n")
+    cat(paste0("  Total Remaining Terms: ", length(pred.tab)), "\n")
+    cat(paste0("  Total Remaining Tokens: ", sum(pred.tab)), "\n")
   }
   # now the vocabulary has been defined
 
@@ -228,9 +239,9 @@ preprocess <- function(data, exact=NULL, partial=NULL, subs=NULL,
   # caused the document to contain zero tokens in the vocabulary:
   category[category == 0][(1:D) %in% unique(doc.id) == FALSE] <- -1
   if (!quiet) {
-  	cat(paste0(sum(category == -1), "additional documents removed because
-  	           they consisted entirely of punctuation or rare terms
-  	           that are not in the vocabulary."))
+  	cat(paste0("\n", sum(category == -1), " additional documents removed "
+  	           "because they consisted entirely of punctuation or rare "
+  	           "terms that are not in the vocabulary."))
   }
   
   # every document must have at least one token in the vocabulary:
@@ -249,6 +260,9 @@ preprocess <- function(data, exact=NULL, partial=NULL, subs=NULL,
   
   # Do stemming:
   if (stem) {
+  	if (!quiet) {
+  	  cat("Performing Stemming\n")
+    }
     V.old <- length(vocab)
   	vocab.stemmed <- vocab
 
@@ -264,20 +278,20 @@ preprocess <- function(data, exact=NULL, partial=NULL, subs=NULL,
     vocab <- unique(vocab.stemmed)
     term.id <- match(vocab.stemmed[term.id], vocab)
     V.new <- length(vocab)
-    if (!quiet) cat(paste0("Vocab of length ", V.old, 
+    if (!quiet) cat(paste0("  Vocab of length ", V.old, 
                     " reduced to length ", V.new, 
                     " after stemming."), "\n")
   }
   if (!quiet) {
     cat(paste0("\n"))
     cat(paste0("Final Summary:\n"))
-    cat(paste0("Total number of tokens in data, N = ", 
+    cat(paste0("  Total number of tokens in data, N = ", 
                length(term.id), ".\n"))
-    cat(paste0("Total number of documents remaining, D = ", 
+    cat(paste0("  Total number of documents remaining, D = ", 
                max(doc.id), ".\n"))
-    cat(paste0("Total number of documents discarded is ", 
+    cat(paste0("  Total number of documents discarded is ", 
                D.orig - max(doc.id), ".\n"))
-    cat(paste0("Total number of terms in vocabulary, W = ", 
+    cat(paste0("  Total number of terms in vocabulary, W = ", 
                length(vocab), ".\n"))
   }
   return(list(term.id=term.id, doc.id=doc.id, vocab=vocab, category=category, 

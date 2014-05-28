@@ -9,6 +9,8 @@ R package for fitting topic models.
 
 * For fitting topic models, there are other software packages available, including MALLET and the R packages 'topicmodels' and 'lda', that are much more popular and better-tested (for speed and accuracy) than this package. This package was developed, more or less, (1) for practice building an R package and (2) to learn about LDA, rather than to become a widely-used package for others. So thanks for checking this out, but we'd recommend MALLET or other existing R packages for fitting topic models, and cpsievert/LDAvis for visualizing of topic models.
 
+<b>Older README</b>:
+
 ### Online examples:
 
 * [xkcd comics](http://glimmer.rstudio.com/cpsievert/xkcd/) with [full analysis](http://bit.ly/19Dmedr)

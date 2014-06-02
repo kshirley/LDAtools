@@ -1,3 +1,4 @@
+#2345678901234567890123456789012345678901234567890123456789012345678901234567890
 #' @title Preprocess raw documents according to various options
 #'
 #' @description Conduct a series of preprocessing steps on raw documents.
@@ -79,38 +80,45 @@
 preprocess <- function(data, exact=NULL, partial=NULL, subs=NULL, 
                        stopwords=NULL, cutoff=2, verbose=FALSE, quiet=FALSE,
                        stem=FALSE, hash="ent") {
+  # Original number of documents:
   D.orig <- length(data)
   
-  # Print part 1:
-  if (!quiet) {
-  	cat("[1] Filtering documents:\n\n")
-  }
-
   # track and get rid of NA/blank documents:
   sel.na <- as.numeric(is.na(data))
   sel.blank <- as.numeric(data == "" & !is.na(data))
   if (!quiet) {
     count.na <- sum(sel.na)
     count.blank <- sum(sel.blank, na.rm=TRUE)
+    cat(paste0("[default] Removing blank documents and NA documents\n\n"))
     cat(paste0(sprintf("  %.1f", round(count.na/D.orig, 3)*100), "% (",
                count.na,"/", D.orig, ") of documents are NA"), "\n")
     cat(paste0(sprintf("  %.1f", round(count.blank/D.orig, 3)*100), "% (",
                count.blank,"/", D.orig, ") of documents are blank"), "\n")
   }
   
-  # Discard documents that exactly match elements of 'exact' or contain 
-  # strings that are elements of 'partial':
+
+  # Print step 1: exact matching documents
+  if (!quiet) cat("\n[1] Filtering 'exact-matching' documents:\n\n")
+
+  # Discard documents that exactly match elements of 'exact'
   sel.exact <- flag.exact(data, exact, verbose=FALSE, quiet)$category
-  sel.partial <- flag.partial(data, partial, verbose=FALSE, quiet)$category
   if (!quiet) {
     cat(paste0(sprintf("  %.1f", round(sum(sel.exact)/D.orig, 3)*100), "% (",
                sum(sel.exact), "/", D.orig, ") of documents discarded as ", 
                "exact matches"), "\n")
+  }
+
+  # Print step 2: partial matching documents
+  if (!quiet) cat("\n[2] Filtering 'partial-matching' documents:\n\n")
+
+  # Discard documents that exactly match elements of 'exact'
+  sel.partial <- flag.partial(data, partial, verbose=FALSE, quiet)$category
+  if (!quiet) {
     cat(paste0(sprintf("  %.1f", round(sum(sel.partial)/D.orig, 3)*100), "% (",
                sum(sel.partial), "/", D.orig, ") of documents discarded as ",
                "partial matches"), "\n")
   }
-  
+
   # Discard the filtered documents and track the category that each one 
   # belonged to:
   tmp.mat <- cbind(sel.exact, sel.partial, sel.na, sel.blank)
@@ -239,8 +247,8 @@ preprocess <- function(data, exact=NULL, partial=NULL, subs=NULL,
   # caused the document to contain zero tokens in the vocabulary:
   category[category == 0][(1:D) %in% unique(doc.id) == FALSE] <- -1
   if (!quiet) {
-  	cat(paste0("\n", sum(category == -1), " additional documents removed "
-  	           "because they consisted entirely of punctuation or rare "
+  	cat(paste0("\n", sum(category == -1), " additional documents removed ",
+  	           "because they consisted entirely of punctuation or rare ",
   	           "terms that are not in the vocabulary."))
   }
   

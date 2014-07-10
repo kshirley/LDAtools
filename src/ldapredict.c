@@ -26,7 +26,7 @@ void ldapredict(int *word_id_R, int *doc_id_R, int *T_R, int *n_chains_R, int *n
   int N = N_R[0];
   int W = W_R[0];
   int D = D_R[0];
-  int i, k, t, w, d, g, j, x;
+  int i, k, t, w, d, g;
   double alpha = alpha_R[0];
 	  
   // Read in the word_id and doc_id vectors:

@@ -9,29 +9,29 @@
 int *ivector();
 void free_ivector();
 
-void minperplex(int *token_id, int *N_R, int *W_R, int *D_R, double *alpha_R, double *beta_R, 
-								double *logp, int *tokenfreq, int *docfreq, int *print_R) {
+void minperplex(int *token_id, int *N_R, int *W_R, int *D_R, double *alpha_R, double *beta_R,
+                double *logp, int *tokenfreq, int *docfreq, int *print_R) {
 	
   // Initialize arguments passed in:
-  int N = N_R[0];
+  //int N = N_R[0];
   int W = W_R[0];
   int D = D_R[0];
   int d, i, w, seen;
-	int print = print_R[0];
+  int print = print_R[0];
   double alpha = alpha_R[0];
   double beta = beta_R[0];
-	double p, theta, phi;
+  double p, theta, phi;
   int *doctable;
 	
-	// Allocate and initialize doctable:
-	doctable = ivector(W);
+  // Allocate and initialize doctable:
+  doctable = ivector(W);
   for (w = 0; w < W; w++) doctable[w] = 0;
 
-	seen = 0; // keep track of how many tokens have been seen
+  seen = 0; // keep track of how many tokens have been seen
   // loop through documents
-	for (d = 0; d < D; d++) {
-		if ((d + 1) % print == 0) Rprintf("Document %d\n", d + 1);
-    // increment the table of tokens for this document
+    for (d = 0; d < D; d++) {
+      if ((d + 1) % print == 0) Rprintf("Document %d\n", d + 1);
+      // increment the table of tokens for this document
   	for (i = 0; i < docfreq[d]; i++) doctable[token_id[seen + i] - 1]++;
 		for (i = 0; i < docfreq[d]; i++) {
 			p = 0.0;  // the probability of token i

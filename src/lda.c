@@ -26,7 +26,7 @@ void lda(int *word_id_R, int *doc_id_R, int *T_R, int *n_chains_R, int *n_iter_R
   int N = N_R[0];
   int W = W_R[0];
   int D = D_R[0];
-  int i, k, t, w, d, g, j, x;
+  int i, k, t, w, d, g;
   double alpha = alpha_R[0];
   double beta = beta_R[0];
 	  
@@ -241,7 +241,7 @@ void free_dmatrix(double **v, int nrow){
 
 // Replicate the Sample function from R, with replacement always:
 void sample(int first, int last, double *prob, int *z){
-  int i, j, l = last - first + 1;
+  int j, l = last - first + 1;
   double x, s;
   x = drand48();
   s = 0.0;

@@ -244,7 +244,7 @@ void sample(int first, int last, double *prob, int *z){
   int j, l = last - first + 1;
   double x, s;
   //x = drand48();
-  x=(rand() / (RAND_MAX + 1.0));
+  x = (double() rand() / (RAND_MAX));
   s = 0.0;
   for (j = 0; j < l; j++){
     s += prob[j];
